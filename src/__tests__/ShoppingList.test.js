@@ -4,7 +4,7 @@ import {
   render,
   screen,
   fireEvent,
-  waitForElementToBeRemoved,
+  waitFor,
 } from "@testing-library/react";
 import { resetData } from "../mocks/handlers";
 import { server } from "../mocks/server";
@@ -92,13 +92,14 @@ test("removes an item from the list when the delete button is clicked", async ()
   const deleteButtons = await screen.findAllByText(/Delete/);
   fireEvent.click(deleteButtons[0]);
 
-  await waitForElementToBeRemoved(() => screen.queryByText(/Yogurt/));
+  await waitFor(() => {
+    expect(screen.queryByText(/Yogurt/)).not.toBeInTheDocument();
+  });
 
-  // Rerender the component to ensure the item was persisted
+  // Optionally, rerender to ensure the component reflects the updated state
   rerender(<ShoppingList />);
 
   const rerenderedDeleteButtons = await screen.findAllByText(/Delete/);
-
   expect(rerenderedDeleteButtons.length).toBe(2);
   expect(screen.queryByText(/Yogurt/)).not.toBeInTheDocument();
 });
